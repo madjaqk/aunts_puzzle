@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Aunts Puzzle</title>
+		<script type="text/javascript" src="jquery-3.2.1.slim.min.js"></script>
+		<script type="text/javascript" src="sowpods.js"></script>
+		<script type="text/javascript">
+
+			function alice(word){
+				// Returns true if the word can be prepended (as in ALICE -> MALICE)
+				const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toLowerCase().split("")
+				return letters.some(letter => sowpods[letter + word])
+			}
+
+			function beatrice(word){
+				return word.length == 8
+			}
+
+			function clover(word){
+				return word.endsWith("er")
+			}
+
+			function dorothy(word){
+				// Returns true if the word starts with one of the seven solfege notes
+				const notes = "do re mi fa sol la ti".split(" ")
+				return notes.some(note => word.startsWith(note))
+			}
+
+			function esther(word){
+				// Returns true if the word contains three consecutive consonants (including Y)
+				const consonant_regex = /[^aeiou]{3}/
+				return Boolean(word.match(consonant_regex))
+			}
+
+			function test(word){
+				word = word.toLowerCase()
+
+				const tests = [alice, beatrice, clover, dorothy, esther]
+				let output = []
+
+				for(let i=0; i<tests.length; i++){
+					output.push(sowpods[word] && tests[i](word) ? "<strong>LIKES</strong>" : "Doesn't like")
+				}
+
+				return output
+			}
+
+			$(document).ready(function(){
+				$("form").submit((e) => {
+					e.preventDefault()
+
+					let word = $("input").val()
+
+					let results = test(word)
+
+					let new_row = `<tr><td><strong>${word}</strong></td>`
+					
+					for(let j=0; j<results.length; j++){
+						new_row += `<td>${results[j]}</td>`
+					}
+					new_row += "</tr>"
+					$("#results").append(new_row)
+					$("input").val("")
+				})
+			})
+		</script>
+	</head>
+	<body>
+		<p>My aunts are all very picky.  They all only like things that are on the SOWPODS word list, but otherwise, finding something they all agree on is nearly impossible.</p>
+		
+		<p><form><input><button>Do They Like It?</button></form></p>
+
+		<table id="results">
+			<tr>
+				<th></th>
+				<th>Alice</th>
+				<th>Beatrice</th>
+				<th>Clover</th>
+				<th>Dorothy</th>
+				<th>Esther</th>
+			</tr>
+		</table>
+		<pre id="matching"></pre>
+	</body>
+</html>
